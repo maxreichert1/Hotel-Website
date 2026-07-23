@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coming Soon</title>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      width:100%; height:100%;
+      overflow:hidden;
+      background:#000;
+    }
+
+    #stage {
+      position:fixed; inset:0;
+      overflow:hidden;
+    }
+
+    #bg-video {
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; display:block;
+    }
+
+    /*
+      The mask SVG sits above the video.
+      CSS filter:blur() is animated here by JS — GPU-accelerated, no re-rasterisation
+      of internal SVG content. The CSS scale(N) transform then amplifies the visual
+      blur naturally: blur stays 0 at start and grows dramatically as you scroll.
+      will-change: transform promotes the element to its own GPU layer.
+    */
+    #mask-svg {
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      overflow:visible;
+      will-change: transform, opacity;
+      z-index:10;
+    }
+
+    #tagline {
+      position:fixed; bottom:7%; left:50%;
+      transform:translateX(-50%);
+      font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-weight:700;                /* Subtitle Bold */
+      font-size:clamp(1.1rem, 2.2vw, 1.75rem);
+      letter-spacing:0.03em;
+      color:#FFE600;
+      /* Authentic Cinema Subtitle Outline & Shadow */
+      -webkit-text-stroke: 1.5px #000;
+      paint-order: stroke fill;
+      text-shadow: 
+        2px  2px 0px #000,
+       -2px -2px 0px #000,
+        2px -2px 0px #000,
+       -2px  2px 0px #000,
+        0px  3px 6px rgba(0, 0, 0, 0.9);
+      white-space:nowrap;
+      opacity:0;
+      pointer-events:none;
+      z-index:30;
+      transition: opacity 0.1s ease-out;
+    }
+  </style>
+</head>
+<body>
+<div id="stage">
+
+  <video id="bg-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
+    <source src="material/Turn_this_photo_into_a_short_H.mp4" type="video/mp4">
+  </video>
+
+  <!--
+    SVG MASK — pure geometry.
+  -->
+  <svg id="mask-svg" xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 1000 562" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <mask id="kh-mask" maskUnits="userSpaceOnUse"
+            x="-5" y="-5" width="1010" height="572">
+        <rect x="-5" y="-5" width="1010" height="572" fill="white"/>
+        <g transform="translate(477,218) scale(0.30)">
+          <path fill="black"
+            d="M135.13,295.71H18.92s26.68-146.55,26.68-146.55
+               C15.84,133.76,1.22,100.99,9.2,69.12
+               c7.58-30.26,35.79-52.57,67.31-52.74
+               c31.88-.17,60.12,21.64,68.13,51.98
+               c8.45,32.03-6.22,65.27-36.21,80.81
+               l26.71,146.53Z"/>
+        </g>
+      </mask>
+    </defs>
+
+    <rect x="0" y="0" width="1000" height="562"
+          fill="#000" mask="url(#kh-mask)"/>
+  </svg>
+
+</div>
+
+<div id="tagline">more coming soon</div>
+
+<script>
+const TOTAL_SCROLL = 2600;
+const MAX_SCALE    = 45;
+const MAX_BLUR_CSS = 8;
+
+const maskSVG = document.getElementById('mask-svg');
+const tagline = document.getElementById('tagline');
+const video   = document.getElementById('bg-video');
+
+// ── Robust Video & Audio Playback Handler ─────────────────────────────────
+let audioUnlocked = false;
+
+function unlockAudioAndPlay() {
+  if (!audioUnlocked) {
+    video.muted = false;
+    audioUnlocked = true;
+  }
+  if (video.paused) {
+    video.play().catch(() => {});
+  }
+}
+
+// Initial muted play for autoplay policy
+video.muted = true;
+video.volume = 0.05;
+video.play().catch(() => {});
+
+video.addEventListener('canplay', () => { video.play().catch(() => {}); });
+document.addEventListener('DOMContentLoaded', () => { video.play().catch(() => {}); });
+
+// Unlock audio on any scroll or gesture
+['wheel', 'touchstart', 'touchmove', 'keydown', 'mousemove', 'click'].forEach(evt => {
+  window.addEventListener(evt, unlockAudioAndPlay, { passive: true });
+});
+
+// Keyhole centre in viewBox
+const KH_CX = 500, KH_CY = 265;
+
+// ── Virtual scroll ────────────────────────────────────────────────────────
+let vY = 0, tY = 0;
+
+window.addEventListener('wheel', e => {
+  e.preventDefault();
+  unlockAudioAndPlay();
+  tY = Math.min(Math.max(tY + e.deltaY * 1.3, 0), TOTAL_SCROLL);
+}, { passive: false });
+
+let ty0 = 0;
+window.addEventListener('touchstart', e => { ty0 = e.touches[0].clientY; unlockAudioAndPlay(); }, { passive: true });
+window.addEventListener('touchmove', e => {
+  e.preventDefault();
+  tY = Math.min(Math.max(tY + (ty0 - e.touches[0].clientY) * 2.2, 0), TOTAL_SCROLL);
+  ty0 = e.touches[0].clientY;
+}, { passive: false });
+
+window.addEventListener('keydown', e => {
+  unlockAudioAndPlay();
+  if      (['ArrowDown', ' ', 'PageDown'].includes(e.key))
+    { tY = Math.min(tY + 180, TOTAL_SCROLL); e.preventDefault(); }
+  else if (['ArrowUp', 'PageUp'].includes(e.key))
+    { tY = Math.max(tY - 180, 0); e.preventDefault(); }
+});
+
+// ── Animation Curve ────────────────────────────────────────────────────────
+// Using t^1.35 gives immediate response from the very first scroll notch
+function ease(t) {
+  return Math.pow(t, 1.35);
+}
+
+function render(sy) {
+  const raw = Math.min(Math.max(sy / TOTAL_SCROLL, 0), 1);
+  const p   = ease(raw);
+
+  // Dynamic Volume: very quiet (2%) at start -> 100% when fully zoomed in
+  if (audioUnlocked) {
+    video.volume = Math.min(1, Math.max(0.02, 0.02 + raw * 0.98));
+  }
+
+  // Hide mask completely when fully zoomed in to eliminate GPU composite overhead
+  if (raw >= 0.985) {
+    maskSVG.style.display = 'none';
+  } else {
+    maskSVG.style.display = 'block';
+
+    // Scale from keyhole centre
+    const scale = 1 + p * (MAX_SCALE - 1);
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const s  = Math.max(vw / 1000, vh / 562);
+    const cx = (vw - 1000*s)/2 + KH_CX*s;
+    const cy = (vh -  562*s)/2 + KH_CY*s;
+    maskSVG.style.transformOrigin = cx+'px '+cy+'px';
+    maskSVG.style.transform = 'scale('+scale+')';
+
+    // Keyhole Opacity: Fades out smoothly between 0.90 and 0.985
+    const maskOpacity = raw > 0.90 ? Math.max(0, (0.985 - raw) / 0.085) : 1;
+    maskSVG.style.opacity = maskOpacity.toFixed(3);
+
+    // CSS blur: grow steadily, but cap/taper near end so GPU doesn't compute heavy filters on 40x textures
+    const blurAmount = raw > 0.88 ? (1 - raw) * 8 * MAX_BLUR_CSS : raw * MAX_BLUR_CSS;
+    maskSVG.style.filter = blurAmount > 0.05 ? 'blur('+blurAmount.toFixed(2)+'px)' : '';
+  }
+
+  // Tagline: starts fading in at 55% scroll progress
+  const textOpacity = Math.max(0, Math.min(1, (raw - 0.55) / 0.35));
+  tagline.style.opacity = textOpacity.toFixed(3);
+}
+
+// Lerp loop
+(function loop() {
+  vY += (tY - vY) * 0.12;
+  if (Math.abs(tY - vY) < 0.05) vY = tY;
+  render(vY);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

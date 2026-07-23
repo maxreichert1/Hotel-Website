@@ -1,0 +1,669 @@
+/* Load Local OTF Fonts from fonts/ directory */
+@font-face {
+  font-family: 'ABC Bingo';
+  src: url('fonts/ABCBingo-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ABC Connect';
+  src: url('fonts/ABCConnect-Flat-Trial.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ABC Monument Grotesk';
+  src: url('fonts/ABCMonumentGroteskGreek-Ultra-Trial.otf') format('opentype');
+  font-weight: 800; /* Ultra */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AT Canopy';
+  src: url('fonts/AT-Canopy-Bold-UNLICENSED-TRIAL.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bandit';
+  src: url('fonts/Bandit-Condensed-trial.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Blankenhorn';
+  src: url('fonts/BlankenhornTrial-Script.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* CSS Reset & System Customizations */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important; /* Force hard, brutalist corners */
+  box-shadow: none !important; /* Remove all drop shadows */
+}
+
+:root {
+  --bg-color: #c8c8c8;        /* Mid-gray background */
+  --card-bg: #ffffff;         /* Pure white cards */
+  --border-color: #000000;    /* Solid black outlines */
+  --text-color: #000000;
+  --text-muted: #666666;
+  
+  --font-ui: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  text-transform: uppercase; /* Helvetica UI in All Caps */
+  font-weight: normal;       /* Default UI weight */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-x: hidden;
+}
+
+/* Prevent Desktop Scrolling - Make everything fit the screen */
+@media (min-width: 769px) {
+  body {
+    height: 100vh;
+    overflow: hidden;
+  }
+  #main-content {
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  #fonts-grid {
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+/* Header Styling - Replicating the simple layout in the screenshot */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  background-color: transparent; /* Remove white fill */
+  border: 1.5px solid var(--border-color); /* Thinner border */
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: 1.3rem;       /* Slightly decreased font size */
+  font-weight: bold;       /* Helvetica Bold */
+  padding: 8px;            /* Equal padding on all 4 sides */
+  line-height: 1;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-btn:hover {
+  background-color: var(--border-color);
+  color: #ffffff;
+}
+
+#btn-logo {
+  letter-spacing: 1px;
+}
+
+/* Main Content area */
+#main-content {
+  width: 100%;
+}
+
+/* Left-aligned wrapping layout, defining box width by font name length */
+#fonts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Decreased distance between cards */
+  width: 100%;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+/* Base Card Styles - Width is defined by text length */
+.font-card {
+  background-color: var(--card-bg);
+  border: 1.5px solid var(--border-color); /* Thinner border */
+  padding: 0 28px; /* Side padding only */
+  height: 140px;   /* Standard height to fit page without scrolling */
+  width: max-content; /* Sized by text content length */
+  display: inline-flex;
+  align-items: center; /* Vertically center the text to make top and bottom distances equal */
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  flex: 0 0 auto; /* Stop cards from stretching */
+}
+
+/* Inline Specimen Container */
+.specimen-text {
+  outline: none;
+  line-height: 1;   /* Set line-height to 1 for perfect vertical centering */
+  font-size: 135px;  /* Uniform font size for all displayed typefaces */
+  white-space: nowrap;
+  user-select: text;
+  text-transform: none !important; /* Retain original casing */
+}
+
+/* Specimen Font Families mapping to local OTF fonts */
+.font-card[data-font="abc-bingo"] .specimen-text {
+  font-family: 'ABC Bingo', sans-serif;
+}
+.font-card[data-font="abc-connect"] .specimen-text {
+  font-family: 'ABC Connect', sans-serif;
+}
+.font-card[data-font="monument"] .specimen-text {
+  font-family: 'ABC Monument Grotesk', sans-serif;
+}
+.font-card[data-font="at-canopy"] .specimen-text {
+  font-family: 'AT Canopy', sans-serif;
+}
+.font-card[data-font="bandit"] .specimen-text {
+  font-family: 'Bandit', sans-serif;
+}
+.font-card[data-font="blankenhorn"] .specimen-text {
+  font-family: 'Blankenhorn', sans-serif;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    height: auto;
+    overflow: auto;
+  }
+  header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .nav-btn {
+    width: 100%;
+    text-align: center;
+  }
+  #fonts-grid {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 40px;
+  }
+  .font-card {
+    width: 100%;
+    padding: 0 16px;
+  }
+  .specimen-text {
+    font-size: 70px; /* Scaled down for mobile screens */
+  }
+}
+
+/* Footer Styling - Centered and borderless */
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-top: 24px;
+  border-top: none;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: normal;       /* Helvetica Regular */
+  margin-top: auto;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.footer-left {
+  position: absolute;
+  left: 0;
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.footer-menu {
+  display: flex;
+  gap: 32px;
+  margin: 0 auto; /* Perfectly centers the links list */
+}
+
+.footer-link {
+  background: none;
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: normal;       /* Helvetica Regular */
+  cursor: pointer;
+  color: var(--text-color);
+  text-decoration: none;
+  outline: none;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Overlay Backdrop */
+.overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 95;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.overlay-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Slide-out Drawers */
+.slide-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 500px;
+  max-width: 100%;
+  height: 100vh;
+  background-color: var(--card-bg);
+  border-left: 1.5px solid var(--border-color); /* Thinner border */
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-drawer.active {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 24px;
+  border-bottom: 1.5px solid var(--border-color); /* Thinner border */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-header h2 {
+  font-family: var(--font-ui);
+  font-size: 1.5rem;
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  font-weight: 300;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.drawer-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.drawer-section {
+  margin-bottom: 32px;
+}
+
+.drawer-section h3 {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: normal;       /* Helvetica Regular */
+  color: var(--text-muted);
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+/* Drawer Interactive Tester */
+#drawer-textarea {
+  width: 100%;
+  border: 1.5px solid var(--border-color); /* Thinner border */
+  padding: 12px;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  outline: none;
+  resize: vertical;
+  margin-bottom: 12px;
+  text-transform: none !important;
+}
+
+.drawer-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-ui);
+}
+
+.drawer-controls input[type="range"] {
+  flex: 1;
+  accent-color: #000000;
+  cursor: pointer;
+}
+
+#drawer-size-val {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+}
+
+/* Weights Listing inside Drawer */
+.weight-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.weight-name {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.weight-specimen {
+  font-size: 1.8rem;
+  flex: 1;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none !important;
+}
+
+/* Character Grid in Drawer */
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  background-color: #f5f5f5;
+  padding: 8px;
+  border: 1.5px solid var(--border-color); /* Thinner border */
+}
+
+.char-cell {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  text-transform: none !important;
+}
+
+/* License Purchase checklist */
+.license-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1.5px solid var(--border-color); /* Thinner border */
+  margin-bottom: 12px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.license-option label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  flex: 1;
+  padding-left: 8px;
+}
+
+.license-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+}
+
+/* Custom checkbox graphic indicator */
+.license-option label::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--border-color); /* Thinner border */
+  position: absolute;
+  left: 36px;
+  background: white;
+}
+
+.license-option input[type="checkbox"]:checked + .license-title::before {
+  content: '✓';
+  position: absolute;
+  left: 40px;
+  top: -2px;
+  font-family: var(--font-ui);
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.license-title {
+  font-weight: normal;       /* Helvetica Regular */
+  font-size: 1rem;
+  padding-left: 28px;
+  position: relative;
+}
+
+.license-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-left: 28px;
+}
+
+.license-price {
+  font-family: var(--font-ui);
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.license-option:has(input[type="checkbox"]:checked) {
+  background-color: #ffffff;
+  border-width: 1.5px; /* Thinner border */
+}
+
+.checkout-summary {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0;
+  font-family: var(--font-ui);
+  font-weight: normal;       /* Helvetica Regular */
+  font-size: 1.2rem;
+  border-top: 1.5px dashed var(--border-color); /* Thinner border */
+  margin-top: 16px;
+}
+
+#btn-add-to-cart, #btn-checkout {
+  width: 100%;
+  background-color: var(--border-color);
+  color: var(--card-bg);
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  font-weight: normal;       /* Helvetica Regular */
+  padding: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#btn-add-to-cart:hover, #btn-checkout:hover {
+  background-color: #222222;
+}
+
+/* Cart Drawer Footer */
+.drawer-footer {
+  padding: 24px;
+  border-top: 1.5px solid var(--border-color); /* Thinner border */
+  background-color: #f9f9f9;
+}
+
+/* Cart Items inside Drawer */
+.cart-item {
+  border: 1.5px solid var(--border-color); /* Thinner border */
+  padding: 16px;
+  margin-bottom: 12px;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.cart-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cart-item-title {
+  font-weight: normal;       /* Helvetica Regular */
+  font-size: 1.1rem;
+}
+
+.cart-item-remove {
+  background: none;
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.cart-item-details {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cart-item-price {
+  font-family: var(--font-ui);
+  font-weight: normal;       /* Helvetica Regular */
+  text-align: right;
+  margin-top: 8px;
+}
+
+#cart-empty-message {
+  text-align: center;
+  font-family: var(--font-ui);
+  color: var(--text-muted);
+  padding: 64px 0;
+  font-weight: normal;       /* Helvetica Regular */
+  letter-spacing: 1px;
+}
+
+/* Modal Overlay Dialog (About panel) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  border: 2px solid var(--border-color); /* Thinner border */
+  width: 600px;
+  max-width: 90%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 24px;
+  border-bottom: 1.5px solid var(--border-color); /* Thinner border */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-family: var(--font-ui);
+  font-size: 1.5rem;
+  font-weight: normal;       /* Helvetica Regular */
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.about-section {
+  margin-bottom: 24px;
+}
+
+.about-section h3 {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: normal;       /* Helvetica Regular */
+  color: var(--text-muted);
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+.about-section p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.about-section a {
+  color: #000000;
+  text-decoration: underline;
+}
